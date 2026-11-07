@@ -1,0 +1,9 @@
+config:
+  line-length: false
+  no-inline-html: false
+  no-duplicate-heading:
+    siblings-only: true
+  no-trailing-spaces:
+    br_spaces: 0
+  ignores:
+    - "**/node_modules/**"
