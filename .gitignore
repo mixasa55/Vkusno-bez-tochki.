@@ -1,0 +1,27 @@
+# Операционная система
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Среда разработки
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Локальное окружение и секреты
+.env
+.env.local
+*.local
+
+# Артефакты сборки (понадобятся с M07)
+dist/
+build/
+out/
+node_modules/
+__pycache__/
+*.pyc
+
+# Логи и временные файлы
+*.log
+tmp/

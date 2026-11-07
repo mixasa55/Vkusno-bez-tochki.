@@ -1,0 +1,14 @@
+config:
+  line-length: false
+  no-inline-html: false
+  no-duplicate-heading: false
+  no-trailing-spaces:
+    br_spaces: 0
+  no-hard-tabs: false
+  no-trailing-punctuation: false
+  no-bare-urls: false
+  no-emphasis-as-heading: false
+  blanks-around-lists: false
+  blanks-around-headings: false
+  ignores:
+    - "**/node_modules/**"
