@@ -1,10 +1,10 @@
 flowchart TB
     user["Пользователь<br/><i>человек</i>"]
 
-    subgraph boundary["Система подбора рецептов"]
-        api["API Сервис<br/><i>контейнер: Python, FastAPI</i><br/>Поиск рецептов, логика КБЖУ"]
-        db[("База данных<br/><i>контейнер: PostgreSQL</i><br/>Рецепты, ингредиенты, цены<br/><b>ЛР 4А</b>")]
-        parser["Парсер цен<br/><i>контейнер: Python Worker</i><br/>Сбор данных с сайтов магазинов<br/><b>ЛР 6А</b>")]
+   subgraph boundary["Система подбора рецептов"]
+        api["API Сервис (Python, FastAPI)"]
+        db[("База данных (PostgreSQL) - Рецепты, цены")]
+        parser["Парсер цен (Python)"]
     end
 
     ext_shop["API магазинов<br/><i>внешняя система</i>"]
