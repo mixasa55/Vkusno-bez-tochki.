@@ -1,18 +1,18 @@
 flowchart TB
-    user["Пользователь<br/><i>человек</i>"]
+    user["Пользователь<br/>человек"]
 
     subgraph boundary["Система подбора рецептов"]
-        api["API Сервис<br/><i>контейнер: Python, FastAPI</i><br/>Поиск рецептов, логика КБЖУ"]
-        db[("База данных<br/><i>контейнер: PostgreSQL</i><br/>Рецепты, ингредиенты, цены<br/><b>ЛР 4А</b>")]
-        parser["Парсер цен<br/><i>контейнер: Python Worker</i><br/>Сбор данных с сайтов магазинов<br/><b>ЛР 6А</b>")]
+        api["API Сервис (Python, FastAPI)"]
+        db[("База данных (PostgreSQL) - Рецепты, цены")]
+        parser["Парсер цен (Python)"]
     end
 
-    ext_shop["API магазинов<br/><i>внешняя система</i>"]
+    ext_shop["API магазинов<br/>внешняя система"]
 
     user -->|"HTTPS"| api
-    api -->|"Читает/пишет рецепты<br/>SQL"| db
-    parser -->|"Пишет цены<br/>SQL"| db
-    parser -->|"Парсит цены<br/>HTTP"| ext_shop
+    api -->|"Читает/пишет рецепты SQL"| db
+    parser -->|"Пишет цены SQL"| db
+    parser -->|"Парсит цены HTTP"| ext_shop
 
     classDef actor fill:#E8EEF7,stroke:#4A7DB5,color:#16202E
     classDef sys fill:#FBF0EC,stroke:#E2603A,color:#16202E
