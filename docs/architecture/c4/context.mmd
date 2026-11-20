@@ -1,0 +1,20 @@
+flowchart TB
+    user["Пользователь<br/><i>человек</i><br/>Ищет рецепты"]
+    athlete["Спортсмен<br/><i>человек</i><br/>Следит за КБЖУ"]
+
+    subgraph boundary["Система подбора рецептов"]
+        system["Сервис рецептов<br/><i>программная система</i><br/>Поиск, КБЖУ, цены"]
+    end
+
+    ext_mail["API магазинов<br/><i>внешняя система</i><br/>Предоставляет цены"]
+
+    user -->|"Вводит ингредиенты<br/>HTTPS"| system
+    athlete -->|"Задает фильтры КБЖУ<br/>HTTPS"| system
+    system -->|"Запрашивает цены<br/>REST API"| ext_mail
+
+    classDef actor fill:#E8EEF7,stroke:#4A7DB5,color:#16202E
+    classDef sys fill:#FBF0EC,stroke:#E2603A,color:#16202E
+    classDef ext fill:#F1F3F6,stroke:#5B6472,color:#16202E
+    class user,athlete actor
+    class system sys
+    class ext_mail ext

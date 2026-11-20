@@ -1,0 +1,34 @@
+erDiagram
+    RECIPE {
+        uuid id PK
+        string title
+        int cooking_time
+        text instructions
+    }
+    INGREDIENT {
+        uuid id PK
+        string name
+        float calories
+    }
+    RECIPE_INGREDIENT {
+        uuid recipe_id FK
+        uuid ingredient_id FK
+        float amount
+    }
+    STORE {
+        uuid id PK
+        string name
+        point location
+    }
+    PRICE {
+        uuid id PK
+        uuid store_id FK
+        uuid ingredient_id FK
+        decimal value
+        timestamp updated_at
+    }
+
+    RECIPE ||--o{ RECIPE_INGREDIENT : contains
+    INGREDIENT ||--o{ RECIPE_INGREDIENT : used_in
+    INGREDIENT ||--o{ PRICE : has
+    STORE ||--o{ PRICE : offers

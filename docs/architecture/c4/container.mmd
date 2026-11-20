@@ -1,0 +1,24 @@
+flowchart TB
+    user["Пользователь<br/><i>человек</i>"]
+
+    subgraph boundary["Система подбора рецептов"]
+        api["API Сервис<br/><i>контейнер: Python, FastAPI</i><br/>Поиск рецептов, логика КБЖУ"]
+        db[("База данных<br/><i>контейнер: PostgreSQL</i><br/>Рецепты, ингредиенты, цены<br/><b>ЛР 4А</b>")]
+        parser["Парсер цен<br/><i>контейнер: Python Worker</i><br/>Сбор данных с сайтов магазинов<br/><b>ЛР 6А</b>")]
+    end
+
+    ext_shop["API магазинов<br/><i>внешняя система</i>"]
+
+    user -->|"HTTPS"| api
+    api -->|"Читает/пишет рецепты<br/>SQL"| db
+    parser -->|"Пишет цены<br/>SQL"| db
+    parser -->|"Парсит цены<br/>HTTP"| ext_shop
+
+    classDef actor fill:#E8EEF7,stroke:#4A7DB5,color:#16202E
+    classDef sys fill:#FBF0EC,stroke:#E2603A,color:#16202E
+    classDef store fill:#ECF6F4,stroke:#3E9E8F,color:#16202E
+    classDef ext fill:#F1F3F6,stroke:#5B6472,color:#16202E
+    class user actor
+    class api,parser sys
+    class db store
+    class ext_shop ext
