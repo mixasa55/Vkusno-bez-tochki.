@@ -45,4 +45,54 @@
 ## Связи (ER-модель)
 * **Ингредиент ↔ Рецепт**: Многие-ко-многим (через таблицу RecipeIngredients с полями: количество, единица измерения).
 * **Ингредиент ↔ Магазин**: Многие-ко-многим (через таблицу ProductPrice).
-* **Рецепт → Пользователь**: Один-ко-многим (пользователь может создать много рецептов).
+* **Рецепт → Пользователь**: Один-ко-многим (один пользователь может иметь много рецептов).
+
+## ER-диаграмма (связи сущностей)
+
+```mermaid
+erDiagram
+    RECIPE ||--o{ RECIPE_INGREDIENT : contains
+    INGREDIENT ||--o{ RECIPE_INGREDIENT : used_in
+    INGREDIENT ||--o{ PRODUCT_PRICE : has_price
+    STORE ||--o{ PRODUCT_PRICE : sells
+    USER_PROFILE ||--o{ RECIPE : creates
+
+    RECIPE {
+        uuid id PK
+        string name
+        int cooking_time
+        text instructions
+        int portions
+    }
+    INGREDIENT {
+        uuid id PK
+        string name
+        string category
+        float calories_per_100g
+    }
+    STORE {
+        uuid id PK
+        string name
+        point location
+        string address
+    }
+    PRODUCT_PRICE {
+        uuid id PK
+        uuid ingredient_id FK
+        uuid store_id FK
+        decimal price
+        timestamp updated_at
+    }
+    RECIPE_INGREDIENT {
+        uuid recipe_id FK
+        uuid ingredient_id FK
+        float amount
+        string unit
+        boolean is_main
+    }
+    USER_PROFILE {
+        uuid id PK
+        float target_calories
+        float target_protein
+        decimal budget_limit
+    }
