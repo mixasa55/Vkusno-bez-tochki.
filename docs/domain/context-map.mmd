@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph own["Наша система"]
+        recipes["Рецепты<br/><i>основной</i><br/>рецепты, ингредиенты, КБЖУ"]
+        prices["Цены и Магазины<br/><i>поддерживающий</i><br/>магазины, цены, геолокация"]
+    end
+
+    ext["Парсер магазинов<br/><i>внешняя система</i>"]
+
+    prices -->|"поставщик-потребитель<br/>запрос цен по ингредиентам"| recipes
+    ext -->|"уровень предотвращения искажений<br/>сырые данные о ценах"| prices
+
+    classDef core fill:#FBF0EC,stroke:#E2603A,color:#16202E
+    classDef sup fill:#ECF6F4,stroke:#3E9E8F,color:#16202E
+    classDef ext fill:#F1F3F6,stroke:#5B6472,color:#16202E
+    class recipes core
+    class prices sup
+    class ext ext
