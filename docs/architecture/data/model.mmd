@@ -1,34 +1,76 @@
 erDiagram
     RECIPE {
         uuid id PK
-        string title
-        int cooking_time
-        text instructions
+        varchar title
+        text description
+        int servings "порции, > 0 (И-3)"
+        int cooking_time_min "минуты, > 0 (И-2)"
+        boolean is_deleted "пометка удаления, рецепт не удаляется физически"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    COOKING_STEP {
+        uuid id PK
+        uuid recipe_id FK
+        smallint position "порядок без пропусков (И-5), UK (recipe_id, position)"
+        text instruction
+        timestamptz created_at
     }
     INGREDIENT {
         uuid id PK
-        string name
-        float calories
+        varchar name UK
+        varchar category
+        numeric kcal_per_100g ">= 0 (И-1)"
+        numeric protein_per_100g ">= 0 (И-1)"
+        numeric fat_per_100g ">= 0 (И-1)"
+        numeric carbs_per_100g ">= 0 (И-1)"
+        timestamptz created_at
+        timestamptz updated_at
     }
     RECIPE_INGREDIENT {
-        uuid recipe_id FK
-        uuid ingredient_id FK
-        float amount
+        uuid recipe_id PK,FK "составной PK: один ингредиент в составе один раз (И-6)"
+        uuid ingredient_id PK,FK
+        numeric amount_g "граммов на порцию, > 0 (И-4)"
+        boolean is_optional "не входит в расчёт стоимости докупки"
+        timestamptz created_at
     }
     STORE {
         uuid id PK
-        string name
-        point location
+        varchar name
+        varchar address
+        numeric latitude "-90..90 (И-8)"
+        numeric longitude "-180..180 (И-8)"
+        boolean is_active "False вместо удаления"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    STORE_PRODUCT {
+        uuid id PK
+        uuid store_id FK
+        uuid ingredient_id FK "ссылка на чужой агрегат по ID (И-9)"
+        varchar title
+        timestamptz created_at
+    }
+    PRICE_SNAPSHOT {
+        uuid id PK
+        timestamptz collected_at "момент сбора (И-10)"
+        timestamptz valid_until "collected_at + TTL 1 час (И-10)"
+        smallint source_status "ok / partial / failed"
+        timestamptz created_at
     }
     PRICE {
         uuid id PK
-        uuid store_id FK
-        uuid ingredient_id FK
-        decimal value
-        timestamp updated_at
+        uuid snapshot_id FK "цена принадлежит снимку"
+        uuid store_product_id FK
+        numeric value ">= 0 (И-7)"
+        char currency "RUB"
+        timestamptz created_at
     }
 
-    RECIPE ||--o{ RECIPE_INGREDIENT : contains
-    INGREDIENT ||--o{ RECIPE_INGREDIENT : used_in
-    INGREDIENT ||--o{ PRICE : has
-    STORE ||--o{ PRICE : offers
+    RECIPE ||--|{ COOKING_STEP : "has steps"
+    RECIPE ||--o{ RECIPE_INGREDIENT : "contains"
+    INGREDIENT ||--o{ RECIPE_INGREDIENT : "used in"
+    STORE ||--o{ STORE_PRODUCT : "offers"
+    INGREDIENT ||--o{ STORE_PRODUCT : "matches"
+    PRICE_SNAPSHOT ||--|{ PRICE : "collects"
+    STORE_PRODUCT ||--o{ PRICE : "priced in"

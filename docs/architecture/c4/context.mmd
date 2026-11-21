@@ -1,20 +1,27 @@
 flowchart TB
-    user["Пользователь<br/><i>человек</i><br/>Ищет рецепты"]
-    athlete["Спортсмен<br/><i>человек</i><br/>Следит за КБЖУ"]
+    user["Пользователь<br/><i>роль: человек</i><br/>Ищет рецепт из того, что есть"]
+    athlete["Спортсмен<br/><i>роль: человек</i><br/>Следит за КБЖУ и бюджетом"]
+    operator["Оператор сервиса<br/><i>роль: человек, он же разработчик</i><br/>Запускает парсер, следит за журналом"]
 
-    subgraph boundary["Система подбора рецептов"]
-        system["Сервис рецептов<br/><i>программная система</i><br/>Поиск, КБЖУ, цены"]
+    subgraph boundary["Система подбора рецептов «Вкусно без точки»"]
+        system["Сервис подбора рецептов<br/><i>программная система</i><br/>Поиск по ингредиентам, КБЖУ порции,<br/>состав и шаги, недостающие ингредиенты, цены докупки"]
     end
 
-    ext_mail["API магазинов<br/><i>внешняя система</i><br/>Предоставляет цены"]
+    ext_prices["Открытые страницы магазинов<br/><i>внешняя система</i><br/>Источник цен, парсится, не API"]
+    ext_nutrition["Открытый справочник КБЖУ<br/><i>внешняя система</i><br/>КБЖУ на 100 г продукта"]
+    ext_maps["Открытые карты (OSM)<br/><i>внешняя система</i><br/>Адреса и координаты магазинов"]
 
-    user -->|"Вводит ингредиенты<br/>HTTPS"| system
-    athlete -->|"Задает фильтры КБЖУ<br/>HTTPS"| system
-    system -->|"Запрашивает цены<br/>REST API"| ext_mail
+    user -->|"Вводит 2–3 ингредиента, открывает карточку<br/>HTTPS/JSON"| system
+    athlete -->|"Задает фильтр по калориям и белкам<br/>HTTPS/JSON"| system
+    operator -->|"Запускает прогон парсера, читает журнал<br/>CLI / HTTPS"| system
+
+    system -->|"Отдаёт список ингредиентов, получает цены<br/>чтение своего снимка цен"| ext_prices
+    system -->|"Запрашивает КБЖУ ингредиента при наполнении справочника<br/>HTTPS"| ext_nutrition
+    system -->|"Уточняет координаты магазина<br/>HTTPS"| ext_maps
 
     classDef actor fill:#E8EEF7,stroke:#4A7DB5,color:#16202E
     classDef sys fill:#FBF0EC,stroke:#E2603A,color:#16202E
     classDef ext fill:#F1F3F6,stroke:#5B6472,color:#16202E
-    class user,athlete actor
+    class user,athlete,operator actor
     class system sys
-    class ext_mail ext
+    class ext_prices,ext_nutrition,ext_maps ext
