@@ -1,24 +1,31 @@
 flowchart TB
-    user["Пользователь<br/><i>человек</i>"]
+    user["Пользователь / Спортсмен<br/><i>человек</i>"]
 
-   subgraph boundary["Система подбора рецептов"]
-        api["API Сервис (Python, FastAPI)"]
-        db[("База данных (PostgreSQL) - Рецепты, цены")]
-        parser["Парсер цен (Python)"]
+    subgraph boundary["Система подбора рецептов «Вкусно без точки» — модульный монолит (ADR-0003)"]
+        web["Веб-интерфейс<br/><i>Одностраничное приложение</i><br/>HTML, CSS, Alpine.js 3<br/>ЛР 3Б"]
+        api["API-сервис<br/><i>Серверное приложение</i><br/>Python 3.14, FastAPI 0.115, Uvicorn 0.30<br/>Модули: recipes, pricing<br/>ЛР 3А"]
+        parser["Парсер цен<br/><i>Фоновый процесс по расписанию</i><br/>Python 3.14, httpx 0.27, APScheduler 3.10<br/>ЛР 4А"]
+        db[("База данных<br/><i>Реляционное хранилище</i><br/>PostgreSQL 16, миграции Alembic 1.13<br/>Рецепты, состав, шаги, магазины, снимки цен<br/>ЛР 2Г")]
     end
 
-    ext_shop["API магазинов<br/><i>внешняя система</i>"]
+    ext_prices["Открытые страницы магазинов<br/><i>внешняя система</i>"]
+    ext_nutrition["Открытый справочник КБЖУ<br/><i>внешняя система</i>"]
+    ext_maps["Открытые карты (OSM)<br/><i>внешняя система</i>"]
 
-    user -->|"HTTPS"| api
-    api -->|"Читает/пишет рецепты<br/>SQL"| db
-    parser -->|"Пишет цены<br/>SQL"| db
-    parser -->|"Парсит цены<br/>HTTP"| ext_shop
+    user -->|"Открывает страницы, отправляет запросы поиска<br/>HTTPS/JSON"| web
+    web -->|"Тот же контракт, что и у внешнего клиента<br/>HTTPS/JSON (OpenAPI)"| api
+    api -->|"Читает рецепты, пишет журнал запросов<br/>SQL (psycopg 3)"| db
+    parser -->|"Пишет новый снимок цен одним транзакционным прогоном<br/>SQL (psycopg 3)"| db
+    parser -->|"Скачивает страницы магазинов раз в сутки<br/>HTTPS"| ext_prices
+    parser -->|"Уточняет координаты магазина<br/>HTTPS"| ext_maps
+    api -.->|"Читает последний валидный снимок, не ждёт парсер (ADR-0005)<br/>чтение из БД"| db
+    api -.->|"Наполнение справочника: КБЖУ на 100 г<br/>HTTPS, вручную скриптом ЛР 4Б"| ext_nutrition
 
     classDef actor fill:#E8EEF7,stroke:#4A7DB5,color:#16202E
     classDef sys fill:#FBF0EC,stroke:#E2603A,color:#16202E
     classDef store fill:#ECF6F4,stroke:#3E9E8F,color:#16202E
     classDef ext fill:#F1F3F6,stroke:#5B6472,color:#16202E
     class user actor
-    class api,parser sys
+    class web,api,parser sys
     class db store
-    class ext_shop ext
+    class ext_prices,ext_nutrition,ext_maps ext

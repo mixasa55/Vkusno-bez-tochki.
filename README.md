@@ -12,6 +12,8 @@
 
 ## Документы
 
+Продукт:
+
 - [Требования](docs/requirements.md)
 - [Карта пути клиента](docs/customer-journey-map.md)
 - [Карта историй](docs/user-story-map.md)
@@ -20,10 +22,27 @@
 - [Процесс команды](docs/process.md)
 - [Журнал изменений](docs/CHANGELOG.md)
 
+Предметная область:
+
+- [Единый язык](docs/domain/ubiquitous-language.md)
+- [Событийное бурление](docs/domain/event-storming.md)
+- [Агрегаты](docs/domain/aggregates.md)
+- [Карта контекстов](docs/domain/context-map.mmd)
+
+Архитектура:
+
+- [Как читать архитектурные документы](docs/architecture/README.md)
+- [Обзор архитектуры](docs/architecture/overview.md)
+- [Записи об архитектурных решениях](docs/adr/README.md)
+- [Ресурсы API](docs/api/resources.md)
+- [Матрица прослеживаемости](docs/traceability.md)
+
 ## Как получить локально
 
+```bash
 git clone git@github.com:mixasa55/Vkusno-bez-tochki..git
 cd Vkusno-bez-tochki.
+```
 
 Кода пока нет — появится в модуле 07.
 
@@ -41,8 +60,10 @@ cd Vkusno-bez-tochki.
 
 Для запуска локальных проверок перед коммитом:
 
+```bash
 pip install pre-commit
 pre-commit install
+```
 
 ## Лицензия
 

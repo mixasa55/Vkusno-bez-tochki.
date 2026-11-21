@@ -72,3 +72,63 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v16
         with:
           globs: '**/*.md'
+
+      - name: Проверить записи о решениях
+        run: |
+          set -e
+          fail=0
+          [ -f docs/adr/README.md ] || { echo "::error::Нет указателя docs/adr/README.md"; exit 1; }
+          for f in docs/adr/[0-9]*.md; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f")
+            grep -q "$base" docs/adr/README.md || { echo "::error file=$f::Запись не упоминается в указателе docs/adr/README.md"; fail=1; }
+            grep -qE '^\- \*\*Статус\*\*: (Принято|Предложено|Заменено|Отклонено)' "$f" || { echo "::error file=$f::Не заполнен статус"; fail=1; }
+            grep -q '^## Контекст' "$f" || { echo "::error file=$f::Нет раздела «Контекст»"; fail=1; }
+            grep -q '^## Решение' "$f" || { echo "::error file=$f::Нет раздела «Решение»"; fail=1; }
+            grep -q '^## Последствия' "$f" || { echo "::error file=$f::Нет раздела «Последствия»"; fail=1; }
+          done
+          exit $fail
+
+      - name: Проверить диаграммы
+        run: |
+          set -e
+          fail=0
+          shopt -s nullglob globstar
+          for f in docs/**/*.mmd docs/*.mmd; do
+            head -1 "$f" | grep -qE '^(flowchart|sequenceDiagram|erDiagram|classDiagram|stateDiagram|gantt)' || { echo "::error file=$f::Первая строка не является типом диаграммы Mermaid"; fail=1; }
+            [ -n "$(tail -c 1 "$f")" ] && { echo "::error file=$f::Файл не заканчивается переводом строки"; fail=1; }
+            quotes=$(tr -cd '"' < "$f" | wc -c)
+            [ $((quotes % 2)) -eq 0 ] || { echo "::error file=$f::Нечётное число кавычек — блок не разберётся"; fail=1; }
+          done
+          for f in $(grep -rl '```mermaid' --include='*.md' . 2>/dev/null || true); do
+            blocks=$(grep -c '^```mermaid' "$f")
+            fences=$(grep -c '^```' "$f")
+            [ $((fences % 2)) -eq 0 ] || { echo "::error file=$f::Незакрытый блок кода"; fail=1; }
+            [ $((fences - blocks * 2)) -eq 0 ] || echo "::warning file=$f::Блоки mermaid чередуются с другими языками — проверьте вручную"
+          done
+          exit $fail
+
+      - name: Проверить незаполненные плейсхолдеры
+        run: |
+          if grep -rnI -E '<заполнить|TODO|TBD|XXX|FIXME|lorem ipsum' --include='*.md' . ; then
+            echo "::error::Найдены незаполненные плейсхолдеры"
+            exit 1
+          fi
+          echo "Плейсхолдеров нет"
+
+      - name: Проверить относительные ссылки
+        run: |
+          set -e
+          fail=0
+          while IFS= read -r f; do
+            dir=$(dirname "$f")
+            for link in $(grep -oE '\]\([^)]+\)' "$f" | sed -E 's/^\]\(//; s/\)$//' | grep -vE '^(https?:|mailto:|#)' || true); do
+              target="${link%%#*}"
+              [ -z "$target" ] && continue
+              if [ ! -e "$dir/$target" ]; then
+                echo "::error file=$f::Ссылка ведёт в никуда: $link"
+                fail=1
+              fi
+            done
+          done < <(find . -name '*.md' -not -path './.git/*')
+          exit $fail
