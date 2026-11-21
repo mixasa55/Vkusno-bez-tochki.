@@ -25,7 +25,7 @@
 Предметная область:
 
 - [Единый язык](docs/domain/ubiquitous-language.md)
-- [Событийное бурление](docs/domain/event-storming.md)
+- [Моделирование событий](docs/domain/event-storming.md)
 - [Агрегаты](docs/domain/aggregates.md)
 - [Карта контекстов](docs/domain/context-map.mmd)
 
